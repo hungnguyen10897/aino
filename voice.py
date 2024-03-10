@@ -1,8 +1,9 @@
-from pvrecorder import PvRecorder
-import struct, wave
+import speech_recognition as sr
 from playsound import playsound
+from pvrecorder import PvRecorder
 
-recorder = PvRecorder(device_index=-1, frame_length=512)
+r = sr.Recognizer()
+r.pause_threshold = 3
 prompt_file_path = "temp/_prompt.mp3"
 
 def text_to_speech(client, text):
@@ -15,23 +16,15 @@ def text_to_speech(client, text):
   playsound("temp/_response.mp3")
 
 def get_prompt_from_speech(client):
-  # Recording
-  audio = []
 
-  try:
+  with sr.Microphone() as source:
+    r.adjust_for_ambient_noise(source)
     print("Listening...")
-    recorder.start()
+    audio = r.listen(source, timeout=10)
+    print("Listening ended")
 
-    while True:
-      frame = recorder.read()
-      # Do something ...
-      audio.extend(frame)
-  except KeyboardInterrupt:
-    recorder.stop()
-    print("Listening stopped")
-    with wave.open(prompt_file_path, 'w') as f:
-      f.setparams((1, 2, 16000, 512, "NONE", "NONE"))
-      f.writeframes(struct.pack("h" * len(audio), *audio))
+  with open(prompt_file_path, "wb") as f:
+    f.write(audio.get_wav_data())
 
   prompt_file= open(prompt_file_path, "rb")
   transcription = client.audio.transcriptions.create(
