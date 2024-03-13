@@ -4,7 +4,7 @@ from assistant import *
 from utils import *
 from voice import text_to_speech, get_prompt_from_speech
 
-API_KEY=os.environ("OPENAI_API_KEY")
+API_KEY=os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=API_KEY)
 
 def submit_message(assistant_id, thread, user_message):

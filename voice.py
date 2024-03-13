@@ -9,7 +9,7 @@ prompt_file_path = "temp/_prompt.mp3"
 def text_to_speech(client, text):
   response = client.audio.speech.create(
     model="tts-1",
-    voice="alloy",
+    voice="nova",
     input=text
   )
   response.stream_to_file("temp/_response.mp3")
@@ -18,7 +18,7 @@ def text_to_speech(client, text):
 def get_prompt_from_speech(client):
 
   with sr.Microphone() as source:
-    r.adjust_for_ambient_noise(source)
+    # r.adjust_for_ambient_noise(source)
     print("Listening...")
     audio = r.listen(source, timeout=10)
     print("Listening ended")
