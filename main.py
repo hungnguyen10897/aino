@@ -3,39 +3,13 @@ import time, sys, os
 from assistant import *
 from utils import *
 from voice import text_to_speech, get_prompt_from_speech, get_prompt_from_speech2
+from assistant import *
 
 API_KEY=os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=API_KEY)
 
 timing = True
 debug = False
-
-def submit_message(assistant_id, thread, user_message):
-  client.beta.threads.messages.create(
-      thread_id=thread.id, role="user", content=user_message
-  )
-  return client.beta.threads.runs.create(
-      thread_id=thread.id,
-      assistant_id=assistant_id,
-  )
-
-def get_latest_response(thread):
-  messages = client.beta.threads.messages.list(thread_id=thread.id, order="desc", limit=2)
-  return messages.data[0].content[0].text.value
-
-def wait_on_run(run, thread):
-  while run.status == "queued" or run.status == "in_progress":
-      run = client.beta.threads.runs.retrieve(
-          thread_id=thread.id,
-          run_id=run.id,
-      )
-      time.sleep(0.5)
-  return run
-
-def create_thread_and_run(assistant_id, user_input):
-  thread = client.beta.threads.create()
-  run = submit_message(assistant_id, thread, user_input)
-  return thread, run
 
 if __name__ == "__main__":
 
@@ -54,11 +28,11 @@ if __name__ == "__main__":
   
   if timing:
     start_time=time.time()
-  thread, run0 = create_thread_and_run(assistant.id, first_prompt)
+  thread, run0 = create_thread_and_run(client, assistant.id, first_prompt)
   
   # Wait till it's finished
-  run0 = wait_on_run(run0, thread)
-  response = get_latest_response(thread)
+  run0 = wait_on_run(client, run0, thread)
+  response = get_latest_response(client, thread)
   if debug:
     print(f"Reponse: {response}")
   if timing:
@@ -76,10 +50,10 @@ if __name__ == "__main__":
     
     if timing:
        start_time=time.time()
-    runN = submit_message(assistant.id, thread, prompt)
-    runN = wait_on_run(runN, thread)
+    runN = submit_message(client, assistant.id, thread, prompt)
+    runN = wait_on_run(client, runN, thread)
 
-    reponse = get_latest_response(thread)
+    reponse = get_latest_response(client, thread)
     
     if debug:
       print(f"Reponse: {reponse}")
