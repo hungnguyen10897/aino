@@ -33,9 +33,9 @@ def wait_on_run(run, thread):
   return run
 
 def create_thread_and_run(assistant_id, user_input):
-    thread = client.beta.threads.create()
-    run = submit_message(assistant_id, thread, user_input)
-    return thread, run
+  thread = client.beta.threads.create()
+  run = submit_message(assistant_id, thread, user_input)
+  return thread, run
 
 if __name__ == "__main__":
 
