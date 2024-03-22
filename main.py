@@ -5,10 +5,10 @@ from utils import *
 from voice import text_to_speech, get_prompt_from_speech, get_prompt_from_speech2
 from assistant import *
 
-API_KEY=os.getenv("OPENAI_API_KEY")
+API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=API_KEY)
 
-timing = True
+_timing = True
 debug = False
 
 if __name__ == "__main__":
@@ -20,13 +20,13 @@ if __name__ == "__main__":
     assistant_id = sys.argv[1]
     assistant = retrieve_assistant(client, assistant_id)
 
-  text_to_speech(client, "Hi! I'm Ismo. How may I help you?\n", timing=True)
+  text_to_speech(client, "Hi! I'm Ismo. How may I help you?\n", timing=_timing)
 
-  first_prompt = get_prompt_from_speech2(client, timing=True)
+  first_prompt = get_prompt_from_speech2(client, timing=_timing)
   if debug:
     print(f"Prompt: {first_prompt}")
   
-  if timing:
+  if _timing:
     start_time=time.time()
   thread, run0 = create_thread_and_run(client, assistant.id, first_prompt)
   
@@ -35,29 +35,40 @@ if __name__ == "__main__":
   response = get_latest_response(client, thread)
   if debug:
     print(f"Reponse: {response}")
-  if timing:
-    print("---Dead Time - first_openap_call: {:.2f} seconds".format(time.time() - start_time))
+  if _timing:
+    print("---Dead Time - first_openai_call: {:.2f} seconds".format(time.time() - start_time))
 
 
-  text_to_speech(client, response, timing=True)
+  text_to_speech(client, response, timing=_timing)
 
   while True:
-    prompt = get_prompt_from_speech2(client, timing=True)
+    prompt = get_prompt_from_speech2(client, timing=_timing)
     if debug:
       print(f"Prompt: {prompt}")
     if prompt.lower() == "end":
       break
     
-    if timing:
+    if _timing:
        start_time=time.time()
     runN = submit_message(client, assistant.id, thread, prompt)
+    
+    if _timing:
+      print("---Dead Time - submit_message: {:.2f} seconds".format(time.time() - start_time))
+      start_time=time.time()
+
     runN = wait_on_run(client, runN, thread)
 
+    if _timing:
+      print("---Dead Time - wait_on_run: {:.2f} seconds".format(time.time() - start_time))
+      start_time=time.time()
+
     reponse = get_latest_response(client, thread)
+
+    if _timing:
+      print("---Dead Time - get_latest_response: {:.2f} seconds".format(time.time() - start_time))
+      start_time=time.time()
     
     if debug:
       print(f"Reponse: {reponse}")
-    if timing:
-      print("---Dead Time - get_response_from_openai: {:.2f} seconds".format(time.time() - start_time))
 
-    text_to_speech(client, reponse, timing=True)
+    text_to_speech(client, reponse, timing=_timing)
