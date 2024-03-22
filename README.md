@@ -1,2 +1,2 @@
 # aino
-Speak Peer Pal
+Speak Pal
