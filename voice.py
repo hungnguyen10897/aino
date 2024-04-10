@@ -1,7 +1,7 @@
 import speech_recognition as sr
 from playsound import playsound
 from pvrecorder import PvRecorder
-import struct, wave, time
+import struct, wave, time, pyaudio
 import configs as cfg
 
 recorder = PvRecorder(device_index=-1, frame_length=512)
@@ -22,7 +22,23 @@ def text_to_speech(client, text, timing = False):
   if timing:
     print("---Dead Time - text_to_speech(): {:.2f} seconds".format(time.time() - start_time))
   playsound("temp/_response.mp3")
+
+def stream_text_to_speech(client, text, timing = False): 
+  player_stream = pyaudio.PyAudio().open(format=pyaudio.paInt16, channels=1, rate=24000, output=True) 
   
+  if timing:
+    start_time = time.time()
+
+  with client.audio.speech.with_streaming_response.create( 
+      model="tts-1", 
+      voice=cfg.VOICE, 
+      response_format="pcm",  # similar to WAV, but without a header chunk at the start. 
+      input=text, 
+  ) as response: 
+      if timing:
+        print("---Dead Time - stream_text_to_speech(): {:.2f} seconds".format(time.time() - start_time))
+      for chunk in response.iter_bytes(chunk_size=1024): 
+          player_stream.write(chunk) 
 
 def get_prompt_from_speech(client):
 
