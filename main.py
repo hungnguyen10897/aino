@@ -21,6 +21,7 @@ if __name__ == "__main__":
     assistant = retrieve_assistant(client, assistant_id)
 
   text_to_speech(client, "Hi! I'm Ismo. How may I help you?\n", timing=_timing)
+  # text_to_speech(client, "Hi! I'm Aino. How may I help you?\n", timing=_timing)
 
   first_prompt = get_prompt_from_speech2(client, timing=_timing)
   if debug:
