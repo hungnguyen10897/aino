@@ -2,7 +2,7 @@ from openai import OpenAI
 import time, sys, os
 from assistant import *
 from utils import *
-from voice import text_to_speech, get_prompt_from_speech, get_prompt_from_speech2, stream_text_to_speech
+from voice import get_prompt_from_speech2, stream_text_to_speech
 from assistant import *
 
 API_KEY = os.getenv("OPENAI_API_KEY")
@@ -20,8 +20,8 @@ if __name__ == "__main__":
     assistant_id = sys.argv[1]
     assistant = retrieve_assistant(client, assistant_id)
 
-  stream_text_to_speech(client, "Hi! I'm Ismo. How may I help you?\n", timing=_timing)
-  # stream_text_to_speech(client, "Hi! I'm Aino. How may I help you?\n", timing=_timing)
+  # stream_text_to_speech(client, "Hi! I'm Ismo. How may I help you?\n", timing=_timing)
+  stream_text_to_speech(client, "Hi! I'm Aino. How may I help you?\n", timing=_timing)
 
   first_prompt = get_prompt_from_speech2(client, timing=_timing)
   if debug:
